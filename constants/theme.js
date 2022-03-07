@@ -7,8 +7,14 @@ export const COLORS = {
     secondary: "#CDCDD2",   // gray
 
     // colors
-    black: "#1E1F20",
+    black: '#000000',
     white: "#FFFFFF",
+    green: '#00AC76',
+    red: '#C04345',
+    blue: '#0043F9',
+    backgroundLight: '#F0F0F3',
+    backgroundMedium: '#B9B9B9',
+    backgroundDark: '#777777',
 
     lightGray: "#F5F5F6",
     lightGray2: "#F6F6F7",
@@ -57,5 +63,6 @@ export const FONTS = {
 };
 
 const appTheme = { COLORS, SIZES, FONTS };
+
 
 export default appTheme;
