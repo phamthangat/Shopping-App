@@ -10,10 +10,12 @@ import {
   Image,
   Dimensions,
   Animated,
+  Alert
 } from "react-native";
 import { COLORS } from "../constants";
 import { Items } from "../Database";
 import { Entypo, Ionicons } from "react-native-vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProductInfo({ route, navigation }) {
   const { productID } = route.params;
@@ -43,6 +45,36 @@ export default function ProductInfo({ route, navigation }) {
   };
   console.log(product);
 
+  //add to cart
+
+  const addToCart = async (id) => {
+    let itemArray = await AsyncStorage.getItem("cartItems");
+    itemArray = JSON.parse(itemArray);
+    console.log(itemArray);
+    if (itemArray) {
+      let array = itemArray;
+      array.push(id);
+
+      try {
+        await AsyncStorage.setItem("cartItems", JSON.stringify(array));
+        Alert.alert("Item Added Successfully to cart");
+        navigation.navigate("Home");
+      } catch (error) {
+        return error;
+      }
+    } else {
+      let array = [];
+      array.push(id);
+      try {
+        await AsyncStorage.setItem("cartItems", JSON.stringify(array));
+        Alert.alert("Item Added Successfully to cart")
+        navigation.navigate("Home");
+      } catch (error) {
+        return error;
+      }
+    }
+  };
+
   //product horizontal
   const renderProduct = ({ item, index }) => {
     return (
@@ -60,7 +92,7 @@ export default function ProductInfo({ route, navigation }) {
             width: "80%",
             height: "100%",
             resizeMode: "contain",
-            marginTop:-15
+            marginTop: -15,
           }}
         ></Image>
       </View>
@@ -99,7 +131,7 @@ export default function ProductInfo({ route, navigation }) {
               paddingLeft: 16,
             }}
           >
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.goBack('Home')}>
               <Entypo
                 name="chevron-left"
                 style={{
@@ -116,6 +148,7 @@ export default function ProductInfo({ route, navigation }) {
             data={product.productImageList ? product.productImageList : null}
             horizontal
             renderItem={renderProduct}
+            keyExtractor={(item) =>item.id}
             showsHorizontalScrollIndicator={false}
             decelerationRate={0.8}
             snapToInterval={width}
