@@ -10,7 +10,8 @@ import {
   Image,
   Dimensions,
   Animated,
-  Alert
+  Alert,
+  Modal,
 } from "react-native";
 import { COLORS } from "../constants";
 import { Items } from "../Database";
@@ -21,6 +22,10 @@ export default function ProductInfo({ route, navigation }) {
   const { productID } = route.params;
 
   const [product, setProduct] = useState({});
+
+  const [dataModal, setDataModal] = useState("");
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const { width, height } = Dimensions.get("window");
 
@@ -67,7 +72,7 @@ export default function ProductInfo({ route, navigation }) {
       array.push(id);
       try {
         await AsyncStorage.setItem("cartItems", JSON.stringify(array));
-        Alert.alert("Item Added Successfully to cart")
+        Alert.alert("Item Added Successfully to cart");
         navigation.navigate("Home");
       } catch (error) {
         return error;
@@ -86,15 +91,29 @@ export default function ProductInfo({ route, navigation }) {
           justifyContent: "center",
         }}
       >
-        <Image
-          source={item}
-          style={{
-            width: "80%",
-            height: "100%",
-            resizeMode: "contain",
-            marginTop: -15,
+        <TouchableOpacity
+         key={index}
+          onPress={() => {
+            setModalVisible(true);
+            setDataModal(item);
           }}
-        ></Image>
+          style={{
+            width: "100%",
+            height: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={item}
+            style={{
+              width: "80%",
+              height: "100%",
+              resizeMode: "contain",
+              marginTop: -15,
+            }}
+          ></Image>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -131,7 +150,7 @@ export default function ProductInfo({ route, navigation }) {
               paddingLeft: 16,
             }}
           >
-            <TouchableOpacity onPress={() => navigation.goBack('Home')}>
+            <TouchableOpacity onPress={() => navigation.goBack("Home")}>
               <Entypo
                 name="chevron-left"
                 style={{
@@ -148,7 +167,7 @@ export default function ProductInfo({ route, navigation }) {
             data={product.productImageList ? product.productImageList : null}
             horizontal
             renderItem={renderProduct}
-            keyExtractor={(item) =>item.id}
+            keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
             decelerationRate={0.8}
             snapToInterval={width}
@@ -158,6 +177,42 @@ export default function ProductInfo({ route, navigation }) {
               { useNativeDriver: false }
             )}
           />
+          <Modal
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View
+              style={{
+                width: width,
+                height: "100%",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(false);
+                }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={dataModal}
+                  style={{
+                    width: "80%",
+                    height: "100%",
+                    resizeMode: "contain",
+                  }}
+                ></Image>
+              </TouchableOpacity>
+            </View>
+          </Modal>
           <View
             style={{
               width: "100%",
