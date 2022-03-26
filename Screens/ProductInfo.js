@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Text,
   View,
@@ -17,11 +17,16 @@ import { COLORS } from "../constants";
 import { Items } from "../Database";
 import { Entypo, Ionicons } from "react-native-vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CartContext } from "../contexts/CartContext";
 
 export default function ProductInfo({ route, navigation }) {
   const { productID } = route.params;
 
   const [product, setProduct] = useState({});
+
+  const { cart, setCart } = useContext(CartContext);
+  console.log(cart, "cart");
+  const [quantity, setQuantity] = useState(1);
 
   const [dataModal, setDataModal] = useState("");
 
@@ -37,7 +42,7 @@ export default function ProductInfo({ route, navigation }) {
       getDataFromDB();
     });
     return unsubcribe;
-  }, [navigation]);
+  }, []);
 
   //   get product data by productID
   const getDataFromDB = async () => {
@@ -48,36 +53,52 @@ export default function ProductInfo({ route, navigation }) {
       }
     }
   };
-  console.log(product);
+  // console.log(product);
 
   //add to cart
 
   const addToCart = async (id) => {
     let itemArray = await AsyncStorage.getItem("cartItems");
     itemArray = JSON.parse(itemArray);
-    console.log(itemArray);
-    if (itemArray) {
-      let array = itemArray;
-      array.push(id);
+    // console.log(itemArray);
+    // if (itemArray) {
+    //   let array = itemArray;
+    //   array.push(id);
 
-      try {
-        await AsyncStorage.setItem("cartItems", JSON.stringify(array));
-        Alert.alert("Item Added Successfully to cart");
-        navigation.navigate("Home");
-      } catch (error) {
-        return error;
-      }
+    //   try {
+    //     await AsyncStorage.setItem("cartItems", JSON.stringify(array));
+    //     // setCart(array);
+    //     Alert.alert("Item added to cart");
+    //     navigation.navigate("Home");
+    //   } catch (error) {
+    //     return error;
+    //   }
+    // } else {
+    //   let array = [];
+    //   array.push(id);
+    //   try {
+    //     await AsyncStorage.setItem("cartItems", JSON.stringify(array));
+    //     array.push(id);
+    //     // setCart(array);
+    //     Alert.alert("Item added to cart");
+    //     navigation.navigate("Home");
+    //   } catch (error) {
+    //     return error;
+    //   }
+    // }
+
+    const exist = cart.find((x) => x.id === product.id);
+    if (exist) {
+      setCart(
+        cart.map((x) =>
+          x.id === product.id ? { ...exist, qty: exist.qty + 1 } : x
+        )
+      );
     } else {
-      let array = [];
-      array.push(id);
-      try {
-        await AsyncStorage.setItem("cartItems", JSON.stringify(array));
-        Alert.alert("Item Added Successfully to cart");
-        navigation.navigate("Home");
-      } catch (error) {
-        return error;
-      }
+      setCart([...cart, { ...product, qty: 1 }]);
     }
+    Alert.alert("Item added to cart");
+    navigation.navigate("Home");
   };
 
   //product horizontal
@@ -92,7 +113,7 @@ export default function ProductInfo({ route, navigation }) {
         }}
       >
         <TouchableOpacity
-         key={index}
+          key={index}
           onPress={() => {
             setModalVisible(true);
             setDataModal(item);

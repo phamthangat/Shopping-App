@@ -1,21 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import {
   Text,
   View,
-  Button,
+  TextInput,
   Image,
   ScrollView,
   StatusBar,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { COLORS } from "../constants";
-import { Entypo, AntDesign, FontAwesome } from "react-native-vector-icons";
+import {
+  Entypo,
+  AntDesign,
+  FontAwesome,
+  Ionicons,
+} from "react-native-vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Items } from "../Database";
 
 export default function Home({ navigation }) {
   const [products, setProducts] = useState([]);
+
   const [accessory, setAccessory] = useState([]);
+
+  // const [initialData, setInitialData] = useState();
+
+  const [data,setData]= useState(Items);
 
   useEffect(() => {
     const unsubcribe = navigation.addListener("focus", () => {
@@ -23,7 +34,7 @@ export default function Home({ navigation }) {
     });
 
     return unsubcribe;
-  }, [navigation]);
+  }, []);
 
   //get data from DB
   const getDataFromDB = () => {
@@ -41,12 +52,25 @@ export default function Home({ navigation }) {
     setAccessory(accessoryList);
   };
 
+  useEffect(() => {
+    setProducts(data);
+  }, []);
+
+  // const handleSearchName= (input) => {
+  //   let searchData = products.filter((item) => {
+  //     return item.productName.toLowerCase().includes(input.toLowerCase())
+  //   });
+  //   setData(searchData);
+  // }
+
   //create an product reusable card
 
   const ProductCard = ({ data }) => {
     return (
       <TouchableOpacity
-      onPress={() => navigation.navigate('ProductInfo',{productID: data.id})}
+        onPress={() =>
+          navigation.navigate("ProductInfo", { productID: data.id })
+        }
         style={{
           width: "48%",
           marginVertical: 14,
@@ -203,6 +227,7 @@ export default function Home({ navigation }) {
       </View>
     );
   }
+
   return (
     <SafeAreaView
       style={{
@@ -219,6 +244,23 @@ export default function Home({ navigation }) {
             Shop & Service
           </Text>
           <Text>Discover and Get Great Product</Text>
+        </View>
+
+        <View style={{ flexDirection: "row" }}>
+          <View style={styles.searchContainer}>
+            <Ionicons
+              name={"search"}
+              size={25}
+              style={{ marginLeft: 25, marginRight: 10 }}
+            />
+            <TextInput
+              placeholder="Search"
+              style={styles.input}
+              // onChangeText={(input) => {
+              //   handleSearchName(input)
+              // }}
+            />
+          </View>
         </View>
 
         {/* products */}
@@ -261,18 +303,20 @@ export default function Home({ navigation }) {
                   opacity: 0.5,
                 }}
               >
-                50
+                2
               </Text>
             </View>
-            <Text
-              style={{
-                fontSize: 14,
-                color: COLORS.blue,
-                fontWeight: "400",
-              }}
-            >
-              SeeAll
-            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("SeeAll")}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: COLORS.blue,
+                  fontWeight: "400",
+                }}
+              >
+                SeeAll
+              </Text>
+            </TouchableOpacity>
           </View>
           <View
             style={{
@@ -327,18 +371,20 @@ export default function Home({ navigation }) {
                   opacity: 0.5,
                 }}
               >
-                78
+                4
               </Text>
             </View>
-            <Text
-              style={{
-                fontSize: 14,
-                color: COLORS.blue,
-                fontWeight: "400",
-              }}
-            >
-              SeeAll
-            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("SeeAll")}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: COLORS.blue,
+                  fontWeight: "400",
+                }}
+              >
+                SeeAll
+              </Text>
+            </TouchableOpacity>
           </View>
           <View
             style={{
@@ -356,3 +402,21 @@ export default function Home({ navigation }) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  searchContainer: {
+    height: 50,
+    backgroundColor: COLORS.backgroundLight,
+    flexDirection: "row",
+    flex: 1,
+    alignItems: "center",
+    borderRadius: 10,
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  input: {
+    fontWeight: "bold",
+    flex: 1,
+    color: COLORS.dark,
+  },
+});
