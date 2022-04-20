@@ -11,12 +11,16 @@ import { COLORS } from "../constants";
 import { Items } from "../Database";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { CartContext } from "../contexts/CartContext";
+import { CartContext} from "../contexts/CartContext";
+import { OrderHistoryContext } from "../contexts/OrderHistoryContext";
 
 const MyCart = ({ navigation }) => {
   // const [product, setProduct] = useState();
   const [total, setTotal] = useState(null);
   const { cart, setCart } = useContext(CartContext);
+  const { orderHistory, setOrderHistory } = useContext(OrderHistoryContext);
+  // console.log(orderHistory,"tesst");
+
   // console.log(cart, "cart cart");
 
   // useEffect(() => {
@@ -93,24 +97,34 @@ const MyCart = ({ navigation }) => {
 
   //checkout
 
-  const checkOut = async () => {
-    // try {
-    //   await AsyncStorage.removeItem("cartItems");
-    // } catch (error) {
-    //   return error;
-    // }
+  const checkOut = async (data) => {
+    setOrderHistory(cart);
+    console.log(typeof(orderHistory));
+    try {
+      let itemArray = await AsyncStorage.getItem("historyItem");
+      // console.log(JSON.stringify(orderHistory),"itemArray");
+      if(itemArray === null) {
+        await AsyncStorage.setItem("historyItem", JSON.stringify(orderHistory));
+      }
+      await AsyncStorage.setItem("historyItem", JSON.stringify(orderHistory));
+      console.log(itemArray,"itemArray");
+    } catch (error) {
+      return error;
+    }
 
+    setCart([]);
     Alert.alert("Items will be Deliverd SOON!");
+    // console.log(orderHistory,"test");
 
-    navigation.navigate("Home");
+
   };
 
   const renderProducts = (data, index) => {
-    // console.log(data,"data");
+    console.log(data,"data");
 
     const onAdd = (data) => {
       const exist = cart.find((x) => x.id === data.id);
-      // console.log(exist,"exit");
+      console.log(exist,"exit");
       if (exist) {
         setCart(
           cart.map((x) =>
@@ -636,7 +650,7 @@ const MyCart = ({ navigation }) => {
         }}
       >
         <TouchableOpacity
-          onPress={() => (total != 0 ? checkOut() : null)}
+          onPress={() => (total != 0 ? cart.map(checkOut) : null)}
           style={{
             width: "86%",
             height: "90%",

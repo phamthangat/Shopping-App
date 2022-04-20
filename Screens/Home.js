@@ -68,6 +68,7 @@ export default function Home({ navigation }) {
   const ProductCard = ({ data }) => {
     return (
       <TouchableOpacity
+      key={data.id}
         onPress={() =>
           navigation.navigate("ProductInfo", { productID: data.id })
         }
@@ -133,7 +134,7 @@ export default function Home({ navigation }) {
           }}
         >
           {data.productName}
-        </Text>
+        </Text> 
         {data.category === "accessory" ? (
           data.isAvailable ? (
             <View>
